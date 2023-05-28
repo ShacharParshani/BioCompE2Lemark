@@ -1,16 +1,20 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
+from Logica import Logica
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    l = Logica(0.9, 0.2, 5, 500)
+    l.run()
+    maxf = 0
+    maxp = None
+    for p in l.current_gen.generation:
+        if p.fitness > maxf:
+            maxp = p
+            maxf = p.fitness
+    print(maxp.decoded_text)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # import pandas as pd
+    #
+    # with open('Letter_Freq.txt', 'r') as f_freq:
+    #     freq = pd.read_csv(f_freq, sep='\t', header=None)
+    # first_column = freq.iloc[:, 0]
+    # print(first_column)
