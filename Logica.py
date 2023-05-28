@@ -1,11 +1,13 @@
 import copy
 import random
+import pandas as pd
 
 from Generation import Generation
 from Permutation import Permutation
 import math
 
 NUM_LETTERS = 26
+
 
 def check_double_letter(letters):
     letter_set = set()
@@ -15,6 +17,8 @@ def check_double_letter(letters):
             return
         letter_set.add(letter)
     print("No double letter found.")
+
+
 def crossover(p1, p2):
     random_cut = random.choice(range(1, NUM_LETTERS - 1))
     new_p = Permutation()
@@ -44,10 +48,10 @@ class Logica:
         self.numCrossover = math.ceil(pCrossover * n)  # number of crossover
         self.numRep = n - self.numCrossover  # number of replication
         self.numMut = math.ceil(pMut * n)  # number of mutation
-        self.current_gen = Generation(n)
-        self.current_gen.create_first_generation()
         self.N = N_optimization
         self.n = n  # n- size of population
+        self.current_gen = Generation(self.n)
+        self.current_gen.create_first_generation()
 
     # def run(self):
     #     for i in range(self.k):
@@ -64,6 +68,12 @@ class Logica:
     #             check_double_letter(p.permutation)
     #         print("max comm w: ", max)
 
+    def save_fitness(self, generation, max_fitness, average_fitness):
+        with open('max_fitness.txt', 'a') as file:
+            file.write(f"{generation}\t{max_fitness}\n")
+        with open('average_fitness.txt', 'a') as file:
+            file.write(f"{generation}\t{average_fitness}\n")
+
     def save_solution(self, permutation):
         with open('perm.txt', 'w') as file:
             # right the decoding text to the file
@@ -77,15 +87,19 @@ class Logica:
     def run(self):
         total_iteration = 0
         max = 0
-        i = 0
-        while max < 0.9:
-            # for i in range(self.k):
+        count_start_over = 0
+        count_fitness_no_change = 0
+        while max < 0.8 and count_start_over <= 10:
+            count_start_over += 1
             i = 0
-            # print(i, max)
-            while (i < 80 or max > 0.3) and (i < 120 or max > 0.5) and max < 0.9:
+            count_fitness_no_change = 0
+            last_fitness = 0
+            while (i < 80 or max > 0.3) and (i < 120 or max > 0.5) and max < 0.99 and count_fitness_no_change <= 5:
                 self.current_gen = self.new_generation()
                 print('generation: ', i)
                 max = 0
+                sum = 0
+                max_fitness = 0
                 maxp = None
                 for p in self.current_gen.generation:
                     # print(p.permutation)
@@ -93,19 +107,33 @@ class Logica:
                     comm = p.common_words
                     # print("common w: ", comm)
                     # print("RMSE: ", p.RMSE)
+                    fitness = p.fitness
+                    sum += fitness
                     if comm > max:
                         max = comm
                         maxp = p
-                print("max comm w: ", max)
+                    if fitness > max_fitness:
+                        max_fitness = fitness
+
+                print("max real words: ", max)
+                print("max fitness: ", max_fitness)
+                print("average fitness: ", sum / self.n)
+                self.save_fitness(i, max_fitness, (sum / self.n))
                 i += 1
                 total_iteration += 1
+                if max_fitness == last_fitness:
+                    count_fitness_no_change += 1
+                else:
+                    count_fitness_no_change = 0
+                last_fitness = max_fitness
             self.current_gen = Generation(self.n)
             self.current_gen.create_first_generation()
         maxp.print_not_in_dict()
+        print("max real words: ", max)
+        print("average real words: ", sum / self.n)
         print(f"finished after {total_iteration} generation")
+        print(f"finished after {Permutation.count_upgrade_fitness_calls} steps (calls to fitness function)")
         self.save_solution(maxp)
-
-
 
     def new_generation(self):
         self.current_gen.order_by_fitness()
