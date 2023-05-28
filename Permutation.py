@@ -1,7 +1,6 @@
 import random
 import math
 import numpy as np
-import pandas
 import pandas as pd
 from Freq import FREQ_ENGLISH_LETTERS
 from Freq import FREQ_ENCODE_TEXT
