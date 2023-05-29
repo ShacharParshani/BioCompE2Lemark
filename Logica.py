@@ -128,7 +128,6 @@ class Logica:
                 last_fitness = max_fitness
             self.current_gen = Generation(self.n)
             self.current_gen.create_first_generation()
-        maxp.print_not_in_dict()
         print("max real words: ", max)
         print("average real words: ", sum / self.n)
         print(f"finished after {total_iteration} generation")
