@@ -17,7 +17,6 @@ class Permutation:
         self.fitness = None
         self.actual_freq = FREQ_ENGLISH_LETTERS
         self.text_freq = FREQ_ENCODE_TEXT
-        self.upgrade_fitness()
         self.RMSE = None
         self.common_words = None
 
@@ -74,19 +73,17 @@ class Permutation:
         return new_fitness
 
     def print_not_in_dict(self):
-        with open('dict.txt', 'r') as f:
-            common_words_file = f.read()
-        common_words = common_words_file.split()
-        #  with open('Letter_Freq.txt', 'r') as f_freq:
-        #      freq = pd.read_csv(f_freq, sep='\t')[0]
+        common_words = COMMON_WORD
 
         self.decoded_text = self.decoding()
+        realWordsCounter = 0
 
         splitedText = self.decoded_text.split()
 
         for word in splitedText:
-            if word not in common_words:
-                # print(word)
+            clean_word = re.sub(r"[^a-zA-Z\s]", "", word)
+
+            if clean_word not in common_words:
                 print(word)
     # def cal_freq(self):
     #     freq = [];
